@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="360" viewBox="0 0 900 360" role="img" aria-label="PhotoKit logo">
+<defs><linearGradient id="accent" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7658e8"/><stop offset="1" stop-color="#ff9c64"/></linearGradient></defs>
+<g transform="translate(380 28)"><path fill="#f4f0e9" d="M0 0h108c61 0 100 38 100 92 0 35-18 56-44 79l-55 49H72v-71h38l32-30c12-11 18-21 18-35 0-25-19-40-51-40H48v176H0z"/><rect x="77" y="73" width="59" height="59" fill="url(#accent)"/></g>
+<text x="450" y="322" fill="#f4f0e9" font-family="Arial,Helvetica,sans-serif" font-size="80" font-weight="700" letter-spacing="-4" text-anchor="middle">PhotoKit</text>
+</svg>

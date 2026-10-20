@@ -1,0 +1,10 @@
+name = "web"
+description = "Max 1920px wide WebP for websites"
+
+[resize]
+width = 1920
+fit = "contain"
+
+[output]
+format = "webp"
+quality = 82

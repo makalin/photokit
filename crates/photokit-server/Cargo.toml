@@ -1,0 +1,18 @@
+[package]
+name = "photokit-server"
+description = "Local HTTP server and embedded web UI for PhotoKit"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+photokit-core.workspace = true
+photokit-ai.workspace = true
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+base64.workspace = true
+dirs.workspace = true
+image.workspace = true
+tiny_http.workspace = true

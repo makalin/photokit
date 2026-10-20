@@ -1,0 +1,11 @@
+name = "story"
+description = "1080x1920 vertical JPEG for stories and reels"
+
+[resize]
+width = 1080
+height = 1920
+fit = "cover"
+
+[output]
+format = "jpeg"
+quality = 88

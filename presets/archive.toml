@@ -1,0 +1,7 @@
+name = "archive"
+description = "Full-size optimized PNG, ICC profile kept"
+
+[output]
+format = "png"
+png_level = 4
+keep_metadata = true

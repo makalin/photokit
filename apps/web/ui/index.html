@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="pk-token" content="__PHOTOKIT_TOKEN__">
+<title>PhotoKit</title>
+<link rel="icon" href="mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><img src="mark.svg" alt="" width="28" height="28"><span>PhotoKit</span></div>
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="quick" class="active">Quick Tools</button>
+    <button role="tab" data-tab="batch">Batch &amp; Rename</button>
+    <button role="tab" data-tab="ai">AI Studio</button>
+    <button role="tab" data-tab="settings">Settings</button>
+  </nav>
+  <div class="status" id="ai-chip" title="AI backends">AI: checking…</div>
+</header>
+
+<main>
+<!-- ================= QUICK TOOLS ================= -->
+<section id="tab-quick" class="tab active">
+  <div class="workspace">
+    <div class="stage-col">
+      <div class="toolbar">
+        <button id="q-open" class="btn">Open…</button>
+        <button id="q-upload" class="btn ghost">Upload</button>
+        <input id="q-file" type="file" accept="image/*" hidden>
+        <span class="sep"></span>
+        <button class="icon" data-op="rotl" title="Rotate left">⟲</button>
+        <button class="icon" data-op="rotr" title="Rotate right">⟳</button>
+        <button class="icon" data-op="fliph" title="Flip horizontal">⇋</button>
+        <button class="icon" data-op="flipv" title="Flip vertical">⇵</button>
+        <button class="icon" id="q-crop" title="Crop (drag on the image)">⌗</button>
+        <button class="icon" data-op="gray" title="Grayscale">◐</button>
+        <label class="straighten" title="Straighten">∠ <input id="q-straighten" type="range" min="-15" max="15" step="0.5" value="0"><output id="q-straighten-v">0°</output></label>
+        <span class="sep"></span>
+        <button class="icon" id="q-undo" title="Undo (Ctrl+Z)">↶</button>
+        <button class="icon" id="q-redo" title="Redo (Ctrl+Shift+Z)">↷</button>
+        <button class="icon" id="q-reset" title="Reset edits">✕</button>
+        <span class="grow"></span>
+        <div class="seg" id="q-view">
+          <button data-view="edit" class="active">Edit</button>
+          <button data-view="output">Output</button>
+          <button data-view="original">Original</button>
+        </div>
+      </div>
+      <div class="stage" id="q-stage">
+        <div class="drop" id="q-drop">
+          <img src="logo.svg" alt="PhotoKit" class="drop-logo">
+          <p><strong>Drop an image</strong>, paste with <kbd>Ctrl/⌘ V</kbd>, or <a href="#" id="q-drop-open">open a file</a></p>
+          <p class="muted">JPEG · PNG · WebP · GIF · BMP · TIFF → JPEG · PNG · WebP · AVIF</p>
+        </div>
+        <div class="canvas-wrap" id="q-canvas" hidden>
+          <img id="q-img" alt="Preview" draggable="false">
+          <div id="q-cropbox" class="cropbox" hidden></div>
+        </div>
+        <div class="crop-actions" id="q-crop-actions" hidden>
+          <select id="q-crop-ratio">
+            <option value="">Free</option><option value="1">1:1</option><option value="1.3333">4:3</option>
+            <option value="1.5">3:2</option><option value="1.7778">16:9</option><option value="0.8">4:5</option><option value="0.5625">9:16</option>
+          </select>
+          <button class="btn" id="q-crop-apply">Apply crop</button>
+          <button class="btn ghost" id="q-crop-cancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <aside class="panel">
+      <div class="card">
+        <h3>Preset</h3>
+        <select id="q-preset"><option value="">Custom</option></select>
+      </div>
+      <div class="card">
+        <h3>Resize</h3>
+        <div class="row">
+          <label>Width<input id="q-w" type="number" min="1" placeholder="Auto"></label>
+          <button class="icon lock active" id="q-lock" title="Keep aspect ratio">🔗</button>
+          <label>Height<input id="q-h" type="number" min="1" placeholder="Auto"></label>
+        </div>
+        <div class="row">
+          <label>Scale %<input id="q-pct" type="number" min="1" max="1000" placeholder="100"></label>
+          <label>Fit<select id="q-fit"><option value="contain">Contain</option><option value="cover">Cover (crop)</option><option value="fill">Fill (stretch)</option></select></label>
+        </div>
+        <label class="check"><input type="checkbox" id="q-upscale"> Allow enlarging</label>
+      </div>
+      <div class="card">
+        <h3>Output</h3>
+        <div class="row">
+          <label>Format<select id="q-format"></select></label>
+          <label>Target KB<input id="q-target" type="number" min="1" placeholder="Off"></label>
+        </div>
+        <label class="range">Quality <output id="q-q-v">85</output><input id="q-q" type="range" min="1" max="100" value="85"></label>
+        <label class="check"><input type="checkbox" id="q-lossless"> Lossless (WebP)</label>
+        <label class="check"><input type="checkbox" id="q-icc"> Keep color profile (ICC)</label>
+      </div>
+      <div class="card stats" id="q-stats">
+        <div><span>Original</span><b id="q-s-orig">—</b></div>
+        <div><span>Output</span><b id="q-s-out">—</b></div>
+        <div><span>Saved</span><b id="q-s-save">—</b></div>
+      </div>
+      <div class="card actions">
+        <button class="btn primary" id="q-save">Save</button>
+        <button class="btn" id="q-download">Download</button>
+        <button class="btn ghost" id="q-to-ai">Send to AI Studio</button>
+        <p class="muted small" id="q-save-msg"></p>
+      </div>
+      <details class="card">
+        <summary>Assistant <span class="muted small">(Ollama)</span></summary>
+        <textarea id="q-assist" rows="2" placeholder="e.g. make it 800px wide webp, rotate right"></textarea>
+        <button class="btn" id="q-assist-go">Apply request</button>
+        <p class="muted small" id="q-assist-msg"></p>
+      </details>
+    </aside>
+  </div>
+</section>
+
+<!-- ================= BATCH & RENAME ================= -->
+<section id="tab-batch" class="tab">
+  <div class="workspace">
+    <div class="stage-col">
+      <div class="toolbar">
+        <button class="btn" id="b-pick">Choose folder…</button>
+        <input id="b-dir" class="path" placeholder="Folder path" spellcheck="false">
+        <label class="check"><input type="checkbox" id="b-rec"> Subfolders</label>
+        <button class="btn ghost" id="b-load">Load</button>
+      </div>
+      <div class="toolbar thin">
+        <label class="check"><input type="checkbox" id="b-all" checked> Select all</label>
+        <span class="muted" id="b-count">No folder loaded</span>
+        <span class="grow"></span>
+        <div class="seg" id="b-view"><button data-view="grid" class="active">Grid</button><button data-view="plan">Names</button></div>
+      </div>
+      <div class="filegrid" id="b-grid"><p class="empty">Choose a folder of photos to rename, resize or convert.</p></div>
+      <table class="plan" id="b-plan" hidden><thead><tr><th>Current</th><th></th><th>New</th></tr></thead><tbody></tbody></table>
+    </div>
+
+    <aside class="panel">
+      <div class="card">
+        <h3>Rename in place</h3>
+        <label>Pattern<input id="r-pattern" value="{parent}-{n:3}" spellcheck="false"></label>
+        <p class="muted small tokens">Tokens: <code>{name}</code> <code>{n:3}</code> <code>{date}</code> <code>{datetime}</code> <code>{w}</code> <code>{h}</code> <code>{parent}</code></p>
+        <div class="row">
+          <label>Start<input id="r-start" type="number" value="1" min="0"></label>
+          <label>Step<input id="r-step" type="number" value="1" min="1"></label>
+          <label>Sort<select id="r-sort"><option value="name">Name</option><option value="date">Date</option><option value="size">Size</option></select></label>
+        </div>
+        <div class="row">
+          <label>Find<input id="r-find" spellcheck="false"></label>
+          <label>Replace<input id="r-replace" spellcheck="false"></label>
+        </div>
+        <div class="row">
+          <label>Case<select id="r-case"><option value="keep">Keep</option><option value="lower">lower</option><option value="upper">UPPER</option></select></label>
+          <label class="check"><input type="checkbox" id="r-ext" checked> .jpg/.png lowercase</label>
+        </div>
+        <div class="row">
+          <button class="btn" id="r-preview">Preview</button>
+          <button class="btn primary" id="r-apply">Rename files</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Resize &amp; convert</h3>
+        <label>Preset<select id="b-preset"><option value="">Custom</option></select></label>
+        <div class="row">
+          <label>Width<input id="b-w" type="number" min="1" placeholder="Auto"></label>
+          <label>Height<input id="b-h" type="number" min="1" placeholder="Auto"></label>
+          <label>Fit<select id="b-fit"><option value="contain">Contain</option><option value="cover">Cover</option><option value="fill">Fill</option></select></label>
+        </div>
+        <div class="row">
+          <label>Format<select id="b-format"><option value="">Keep</option></select></label>
+          <label>Quality<input id="b-q" type="number" min="1" max="100" value="85"></label>
+          <label>Max KB<input id="b-target" type="number" min="1" placeholder="Off"></label>
+        </div>
+        <label>Output names<input id="b-name" value="{name}" spellcheck="false"></label>
+        <label>Output folder<input id="b-out" class="path" placeholder="&lt;folder&gt;/photokit-out" spellcheck="false"></label>
+        <div class="row">
+          <label class="check"><input type="checkbox" id="b-icc"> Keep ICC</label>
+          <label class="check"><input type="checkbox" id="b-overwrite"> Overwrite</label>
+        </div>
+        <div class="row">
+          <button class="btn" id="b-plan-btn">Preview names</button>
+          <button class="btn primary" id="b-run">Process</button>
+        </div>
+      </div>
+
+      <div class="card" id="b-progress" hidden>
+        <div class="progress"><div id="b-bar"></div></div>
+        <p id="b-msg" class="small"></p>
+        <button class="btn ghost" id="b-cancel">Cancel</button>
+        <ul class="log" id="b-log"></ul>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ================= AI STUDIO ================= -->
+<section id="tab-ai" class="tab">
+  <div class="workspace">
+    <div class="stage-col">
+      <div class="ai-form card">
+        <div class="row">
+          <label>Mode<select id="a-mode">
+            <option value="text_to_image">Text to image</option>
+            <option value="image_to_image">Image to image</option>
+            <option value="inpaint">Inpaint (paint a mask)</option>
+            <option value="outpaint">Outpaint (extend canvas)</option>
+            <option value="upscale">Upscale</option>
+            <option value="remove_background">Remove background</option>
+          </select></label>
+          <label>Backend<select id="a-backend"></select></label>
+          <label>Model<select id="a-model"><option value="">Default</option></select></label>
+        </div>
+        <label class="prompt">Prompt
+          <textarea id="a-prompt" rows="3" placeholder="A retro-futurist city at sunset, volumetric light, 35mm photo"></textarea>
+        </label>
+        <div class="row">
+          <button class="btn ghost" id="a-enhance" title="Rewrite with Ollama">✨ Enhance prompt</button>
+          <span class="grow"></span>
+        </div>
+        <details>
+          <summary>Advanced</summary>
+          <label>Negative prompt<input id="a-neg" value="blurry, low quality, watermark, text"></label>
+          <div class="row">
+            <label>Size<select id="a-size">
+              <option value="1024x1024">1024 × 1024</option><option value="1152x896">1152 × 896</option><option value="896x1152">896 × 1152</option>
+              <option value="1344x768">1344 × 768</option><option value="768x1344">768 × 1344</option><option value="512x512">512 × 512</option><option value="768x512">768 × 512</option>
+            </select></label>
+            <label>Steps<input id="a-steps" type="number" value="24" min="1" max="200"></label>
+            <label>CFG<input id="a-cfg" type="number" value="7" step="0.5" min="0" max="30"></label>
+          </div>
+          <div class="row">
+            <label>Seed<input id="a-seed" placeholder="Random"></label>
+            <label>Images<input id="a-batch" type="number" value="1" min="1" max="8"></label>
+            <label data-for="image_to_image">Strength<input id="a-denoise" type="number" value="0.6" step="0.05" min="0" max="1"></label>
+            <label data-for="upscale">Scale<input id="a-scale" type="number" value="2" step="0.5" min="1" max="8"></label>
+          </div>
+          <div class="row" data-for="outpaint">
+            <label>Left<input id="a-pl" type="number" value="0" min="0" step="64"></label>
+            <label>Top<input id="a-pt" type="number" value="0" min="0" step="64"></label>
+            <label>Right<input id="a-pr" type="number" value="256" min="0" step="64"></label>
+            <label>Bottom<input id="a-pb" type="number" value="0" min="0" step="64"></label>
+          </div>
+        </details>
+      </div>
+
+      <div class="ai-io">
+        <div class="card source" id="a-source-card">
+          <div class="card-head"><h3>Source</h3>
+            <span class="grow"></span>
+            <button class="btn ghost small" id="a-src-open">Open…</button>
+            <button class="btn ghost small" id="a-src-quick">From Quick Tools</button>
+          </div>
+          <div class="mask-wrap" id="a-mask-wrap">
+            <p class="empty" id="a-src-empty">Image modes need a source image.</p>
+            <img id="a-src-img" alt="" hidden>
+            <canvas id="a-mask" hidden></canvas>
+          </div>
+          <div class="row mask-tools" id="a-mask-tools" hidden>
+            <label class="range">Brush <input id="a-brush" type="range" min="4" max="200" value="40"></label>
+            <button class="btn ghost small" id="a-mask-clear">Clear mask</button>
+            <button class="btn ghost small" id="a-mask-invert">Invert</button>
+          </div>
+        </div>
+        <div class="card result">
+          <div class="card-head"><h3>Result</h3><span class="grow"></span><span class="muted small" id="a-result-meta"></span></div>
+          <div class="result-view" id="a-result"><p class="empty">Generated images appear here.</p></div>
+          <div class="row" id="a-result-actions" hidden>
+            <button class="btn" id="a-r-save">Save</button>
+            <button class="btn ghost" id="a-r-download">Download</button>
+            <button class="btn ghost" id="a-r-quick">Open in Quick Tools</button>
+            <button class="btn ghost" id="a-r-source">Use as source</button>
+            <button class="btn ghost" id="a-r-reuse">Reuse settings</button>
+          </div>
+        </div>
+      </div>
+      <div class="gen-bar">
+        <button class="btn primary big" id="a-go">Generate</button>
+        <button class="btn ghost" id="a-cancel" hidden>Cancel</button>
+        <div class="progress grow" id="a-progress" hidden><div id="a-bar"></div></div>
+        <span class="muted small" id="a-msg"></span>
+      </div>
+    </div>
+    <aside class="panel">
+      <div class="card">
+        <div class="card-head"><h3>Backends</h3><span class="grow"></span><button class="btn ghost small" id="a-refresh">Refresh</button></div>
+        <div id="a-backends" class="backends"><p class="muted small">Checking…</p></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>History</h3><span class="grow"></span></div>
+        <div class="gallery" id="a-gallery"><p class="muted small">No generations yet.</p></div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ================= SETTINGS ================= -->
+<section id="tab-settings" class="tab">
+  <div class="settings">
+    <div class="card">
+      <h3>ComfyUI</h3>
+      <label>Server URL<input id="c-comfy-url" spellcheck="false"></label>
+      <label>Default checkpoint<input id="c-comfy-ckpt" placeholder="First available" spellcheck="false"></label>
+      <label>Upscale model<input id="c-comfy-up" placeholder="First available" spellcheck="false"></label>
+      <label>Custom workflow folder<input id="c-comfy-wf" class="path" placeholder="Optional" spellcheck="false"></label>
+      <p class="muted small">Start ComfyUI with <code>python main.py --listen 127.0.0.1 --port 8188</code>.</p>
+    </div>
+    <div class="card">
+      <h3>Local worker</h3>
+      <label>Worker URL<input id="c-worker-url" spellcheck="false"></label>
+      <p class="muted small">Run <code>python workers/local-inference/worker.py</code> (add <code>--mock</code> to try it without a GPU).</p>
+      <h3>Ollama</h3>
+      <label>Ollama URL<input id="c-ollama-url" spellcheck="false"></label>
+      <label>Model<input id="c-ollama-model" spellcheck="false"></label>
+    </div>
+    <div class="card">
+      <h3>Defaults</h3>
+      <label>Default AI backend<select id="c-backend"><option value="comfyui">ComfyUI</option><option value="worker">Local worker</option></select></label>
+      <div class="row">
+        <label>Export format<select id="c-format"></select></label>
+        <label>Quality<input id="c-quality" type="number" min="1" max="100"></label>
+      </div>
+      <div class="row">
+        <button class="btn primary" id="c-save">Save settings</button>
+        <span class="muted small" id="c-msg"></span>
+      </div>
+    </div>
+    <div class="card about">
+      <img src="logo.svg" alt="PhotoKit" class="about-logo">
+      <p class="muted small" id="c-about"></p>
+      <p class="muted small">Everything runs on this computer. Nothing is uploaded unless you configure a remote backend.</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- File / folder browser -->
+<dialog id="fb">
+  <form method="dialog" class="fb">
+    <header>
+      <h3 id="fb-title">Open</h3>
+      <span class="grow"></span>
+      <button class="icon" value="cancel" title="Close">✕</button>
+    </header>
+    <div class="fb-bar">
+      <button type="button" class="icon" id="fb-up" title="Up">↑</button>
+      <input id="fb-path" class="path" spellcheck="false">
+      <select id="fb-roots" title="Places"></select>
+    </div>
+    <div class="fb-list" id="fb-list"></div>
+    <footer>
+      <input id="fb-name" placeholder="File name" hidden>
+      <span class="grow muted small" id="fb-info"></span>
+      <button type="button" class="btn ghost" value="cancel" id="fb-cancel">Cancel</button>
+      <button type="button" class="btn primary" id="fb-ok">Select folder</button>
+    </footer>
+  </form>
+</dialog>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "10": { "class_type": "LoadImage", "inputs": { "image": "{{image}}" } },
+  "14": { "class_type": "UpscaleModelLoader", "inputs": { "model_name": "{{upscale_model}}" } },
+  "15": { "class_type": "ImageUpscaleWithModel", "inputs": { "upscale_model": ["14", 0], "image": ["10", 0] } },
+  "9": { "class_type": "SaveImage", "inputs": { "filename_prefix": "photokit", "images": ["15", 0] } }
+}

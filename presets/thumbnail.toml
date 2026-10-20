@@ -1,0 +1,12 @@
+name = "thumbnail"
+description = "400x400 cover-cropped WebP thumbnails"
+name_pattern = "{name}-thumb"
+
+[resize]
+width = 400
+height = 400
+fit = "cover"
+
+[output]
+format = "webp"
+quality = 75

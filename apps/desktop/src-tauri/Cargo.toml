@@ -1,0 +1,19 @@
+[package]
+name = "photokit-desktop"
+description = "PhotoKit desktop app (Tauri 2)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+photokit-server.workspace = true
+anyhow.workspace = true
+tauri = { version = "2", features = [] }
+
+[features]
+# Tauri uses this to tell dev builds from bundled ones.
+custom-protocol = ["tauri/custom-protocol"]

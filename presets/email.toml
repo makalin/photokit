@@ -1,0 +1,12 @@
+name = "email"
+description = "1600px JPEG under 300 KB for attachments"
+
+[resize]
+width = 1600
+height = 1600
+fit = "contain"
+
+[output]
+format = "jpeg"
+quality = 85
+target_kb = 300

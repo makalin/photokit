@@ -1,0 +1,25 @@
+[package]
+name = "photokit-cli"
+description = "PhotoKit command-line interface"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "photokit"
+path = "src/main.rs"
+
+[dependencies]
+photokit-core.workspace = true
+photokit-ai.workspace = true
+photokit-server.workspace = true
+anyhow.workspace = true
+serde_json.workspace = true
+toml.workspace = true
+clap.workspace = true
+image.workspace = true
+
+[dev-dependencies]
+image.workspace = true
+serde_json.workspace = true

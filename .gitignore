@@ -1,0 +1,18 @@
+/target
+**/target
+.DS_Store
+__pycache__/
+*.pyc
+.venv/
+/apps/desktop/src-tauri/gen/
+
+# Secrets and signing material — keep these out of the repo
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.cer
+*.mobileprovision
+*.provisionprofile

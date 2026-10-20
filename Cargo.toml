@@ -1,0 +1,58 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/photokit-codecs",
+    "crates/photokit-core",
+    "crates/photokit-ai",
+    "crates/photokit-server",
+    "crates/photokit-cli",
+    "apps/desktop/src-tauri",
+]
+# The desktop app pulls in Tauri; build it explicitly with `cargo build -p photokit-desktop`.
+default-members = [
+    "crates/photokit-codecs",
+    "crates/photokit-core",
+    "crates/photokit-ai",
+    "crates/photokit-server",
+    "crates/photokit-cli",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.88"
+license = "MIT"
+authors = ["Mehmet T. AKALIN"]
+repository = "https://github.com/makalin/photokit"
+
+[workspace.dependencies]
+photokit-codecs = { path = "crates/photokit-codecs" }
+photokit-core = { path = "crates/photokit-core" }
+photokit-ai = { path = "crates/photokit-ai" }
+photokit-server = { path = "crates/photokit-server" }
+
+anyhow = "1"
+thiserror = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+rayon = "1.10"
+base64 = "0.22"
+dirs = "6"
+image = { version = "0.25.6", default-features = false, features = ["jpeg", "png", "webp", "gif", "bmp", "tiff", "avif", "rayon"] }
+fast_image_resize = { version = "6", features = ["image"] }
+webp = { version = "0.3", default-features = false }
+oxipng = { version = "10", default-features = false, features = ["parallel"] }
+ureq = { version = "2.12", default-features = false, features = ["json"] }
+tiny_http = "0.12"
+clap = { version = "4.5", features = ["derive"] }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = true
+
+# Image codecs are painfully slow unoptimized; keep dev builds usable.
+[profile.dev.package."*"]
+opt-level = 3

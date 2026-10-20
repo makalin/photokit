@@ -1,0 +1,11 @@
+name = "social"
+description = "1080x1080 square JPEG crop for social posts"
+
+[resize]
+width = 1080
+height = 1080
+fit = "cover"
+
+[output]
+format = "jpeg"
+quality = 88
